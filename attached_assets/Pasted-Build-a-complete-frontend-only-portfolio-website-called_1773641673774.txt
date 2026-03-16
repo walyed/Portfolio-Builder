@@ -1,0 +1,417 @@
+Build a complete frontend-only portfolio website called "InteriorCraft" using Next.js 
+(App Router) + Tailwind CSS + shadcn/ui. No backend or database — use hardcoded dummy 
+data and placeholder images (https://picsum.photos). All CMS changes must persist via 
+localStorage so edits survive page refresh. The site should feel luxury, clean, and 
+minimalist. Use: off-white (#FAF9F7), warm charcoal (#1C1C1C), muted gold (#C9A84C), 
+soft warm grays.
+
+Typography: "Cormorant Garamond" (headings) + "Inter" (body) from Google Fonts.
+Animations: Framer Motion for transitions and scroll reveals.
+State: React Context (CMSContext) wraps entire app — all content (products, pages, 
+settings) lives in one context, initialized from localStorage, persisted on every change.
+
+═══════════════════════════════════════════
+PART 1 — PUBLIC WEBSITE
+═══════════════════════════════════════════
+
+## PERSISTENT LAYOUT
+- Fixed LEFT SIDEBAR:
+  - "InteriorCraft" logo (editable via CMS)
+  - Product category links (dynamic — rendered from CMS categories list)
+  - Bottom: WhatsApp + Instagram icons (numbers editable via CMS)
+- TOP NAVBAR: Home | About | Contact Us
+- Floating WhatsApp button (bottom-right, all pages) — number from CMS settings
+- Footer: logo, nav links, tagline, copyright year — all editable via CMS
+
+---
+
+## HOME PAGE (/)
+All sections are CMS-controlled — every piece of text, image, and toggle is editable.
+
+Sections (each can be toggled visible/hidden from CMS):
+1. HERO — background image, headline, subheadline, CTA button text + link
+2. FEATURED PRODUCTS — heading, subheading, select which products appear (up to 6)
+3. STATS BAR — 4 stats, each with number and label (e.g. "200+ Projects")
+4. ABOUT TEASER — heading, 2 paragraphs, image, button text
+5. TESTIMONIALS — heading, list of testimonials (add/edit/remove each)
+6. BRANDS/PARTNERS — logo strip (name + image per brand)
+7. CTA BANNER — background color/image, heading, subtext, button
+
+---
+
+## PRODUCTS PAGE /products/[category]
+- Category title and description (editable per category)
+- Hero banner image per category (editable)
+- Product grid — pulled from CMS filtered by category
+- Each card: image, name, tagline, "View Details"
+
+## PRODUCT DETAIL PAGE /products/[category]/[productId]
+- Image gallery (main + thumbnails, all editable)
+- Name, category badge, full description
+- Specifications table (dynamic key-value pairs, add as many rows as needed)
+- Dimensions (W × H × D + optional diagram note)
+- Portfolio section — "Installed In" photos with caption per photo
+- WhatsApp inquiry button — prefills message with product name
+
+---
+
+## ABOUT PAGE (/about)
+All CMS-controlled sections:
+1. Hero — image, headline, subtext
+2. Studio Story — heading, body text (rich textarea), image
+3. Our Process — steps list (icon, title, description per step — add/remove)
+4. Team Members — cards (photo, name, role, bio per member — add/remove)
+5. Brand Values — cards (icon, title, description — add/remove)
+6. Awards / Recognition — optional section, list of items
+
+---
+
+## CONTACT PAGE (/contact)
+- Contact form (Name, Phone, Email, Message, Product Interest dropdown)
+- Right panel: phone, email, address, WhatsApp, map embed URL — all from CMS
+- On submit: toast notification, stores submission in localStorage messages list
+
+═══════════════════════════════════════════
+PART 2 — ADMIN / CMS PANEL (/admin)
+═══════════════════════════════════════════
+
+## ACCESS
+- Route: /admin
+- Password gate: input field, hardcoded password "admin123", stored in localStorage
+- Session persists until "Logout" is clicked
+- Clean login screen with InteriorCraft logo
+
+---
+
+## ADMIN LAYOUT
+- Left sidebar with sections listed below
+- Top bar: "InteriorCraft CMS", logged-in indicator, Logout button
+- Main content area (right)
+- Unsaved changes indicator ("● Unsaved changes" dot in top bar)
+- Global Save button — commits all context state to localStorage
+
+---
+
+## CMS SECTIONS
+
+### 1. 📊 DASHBOARD
+- Cards showing live counts: Total Products, Categories, Testimonials, 
+  Team Members, Unread Messages
+- Quick action buttons: Add Product, Add Category, View Messages
+- "Last saved" timestamp
+
+---
+
+### 2. 🏠 HOME PAGE EDITOR
+Visual section list — each section has:
+- Toggle ON/OFF (hides section from public site)
+- "Edit" button → opens inline editor panel
+
+Per section editors:
+
+  HERO:
+  - Text input: Headline
+  - Text input: Subheadline
+  - Text input: CTA Button Label
+  - Text input: CTA Button Link
+  - Image URL input + preview
+
+  FEATURED PRODUCTS:
+  - Text: Section Heading
+  - Multi-select dropdown: Choose up to 6 products from all products
+
+  STATS BAR:
+  - Add / remove stat items
+  - Per item: Number field, Label field
+
+  ABOUT TEASER:
+  - Heading, Paragraph 1, Paragraph 2
+  - Image URL + preview
+  - Button label + link
+
+  TESTIMONIALS:
+  - Add / remove testimonials
+  - Per testimonial: Client Name, Role/Company, Quote text, Star rating (1-5),
+    Avatar image URL
+
+  BRANDS/PARTNERS:
+  - Add / remove brand items
+  - Per brand: Brand name, Logo image URL
+
+  CTA BANNER:
+  - Heading, Subtext, Button label, Button link
+  - Background: color picker OR image URL toggle
+
+---
+
+### 3. 📦 PRODUCTS MANAGER
+
+#### Product List View
+- Search bar (filter by name)
+- Filter by category dropdown
+- Table columns: Thumbnail | Name | Category | Visible | Actions
+- Bulk select + bulk delete
+- "Add Product" button (top right)
+
+#### Add / Edit Product — Full Modal or Slide-over Panel
+Tabs inside the form:
+
+  TAB 1 — BASIC INFO:
+  - Product Name
+  - Category (dropdown from categories list)
+  - Short Tagline (shown on card)
+  - Full Description (large textarea)
+  - Visible toggle (show/hide on public site)
+  - Featured toggle (show in Featured section)
+
+  TAB 2 — IMAGES:
+  - Main Gallery Images: add image URLs (up to 10), reorder by drag, 
+    mark one as "primary"
+  - Portfolio / Installed Photos: add image URL + caption per photo (up to 6)
+  - All images show live preview thumbnails
+
+  TAB 3 — SPECIFICATIONS:
+  - Dynamic key-value table
+  - "Add Row" button — each row: Spec Name input + Value input
+  - Drag to reorder rows
+  - Delete row button
+  - Pre-fill button: loads common defaults 
+    (Material, Finish, Color Options, Lead Time, Origin)
+
+  TAB 4 — DIMENSIONS:
+  - Width, Height, Depth (number inputs with unit selector: mm / cm / inches)
+  - Optional: Weight field
+  - Notes field (e.g. "Custom sizes available")
+
+  TAB 5 — SEO & META (for future use):
+  - Meta title, Meta description, URL slug (auto-generated from name, editable)
+
+  Save / Cancel buttons — Save updates CMSContext + localStorage
+
+---
+
+### 4. 🗂️ CATEGORIES & SIDEBAR MANAGER
+
+#### Category List
+- Drag-to-reorder list (visual handle, updates sidebar order on public site)
+- Each category row: icon/emoji | name | product count | visible toggle | actions
+
+#### Add / Edit Category Modal:
+- Category Name
+- URL Slug (auto from name)
+- Icon (emoji picker — simple input with emoji suggestions)
+- Short Description (shown on /products/[category] page header)
+- Hero Banner Image URL + preview
+- Visible toggle
+
+#### Sidebar Settings:
+- Show/hide sidebar on mobile toggle
+- Sidebar label (default: "Collections")
+- Bottom links: edit WhatsApp number, Instagram URL
+
+---
+
+### 5. 📄 ABOUT PAGE EDITOR
+
+All sections listed with toggle + edit:
+
+  HERO: image URL, headline, subtext
+
+  STUDIO STORY: heading, body (large textarea), image URL
+
+  PROCESS STEPS (add/remove/reorder):
+  - Per step: emoji icon, step title, description
+
+  TEAM MEMBERS (add/remove):
+  - Per member: name, role, bio, photo URL, LinkedIn URL (optional)
+
+  BRAND VALUES (add/remove):
+  - Per value: emoji icon, title, description text
+
+  AWARDS (add/remove):
+  - Per award: year, title, issuing organization
+
+---
+
+### 6. 📬 CONTACT PAGE EDITOR
+
+  CONTACT INFO:
+  - Phone number
+  - Email address
+  - WhatsApp number (used for button)
+  - Physical address (textarea)
+  - Google Maps embed URL
+  - Office hours text
+
+  FORM SETTINGS:
+  - Form heading + subtext
+  - Product interest dropdown options (add/remove options)
+  - Success toast message text
+
+---
+
+### 7. ⚙️ GLOBAL SETTINGS
+
+  BRANDING:
+  - Site name ("InteriorCraft")
+  - Tagline
+  - Logo URL + preview
+  - Favicon URL
+
+  COLORS (live preview as you change):
+  - Primary background color
+  - Accent/gold color
+  - Text color
+  - Sidebar background color
+
+  TYPOGRAPHY:
+  - Heading font (text input for Google Font name)
+  - Body font (text input)
+
+  SOCIAL LINKS:
+  - WhatsApp number (global, used for floating button)
+  - Instagram URL
+  - Facebook URL (optional)
+
+  FOOTER:
+  - Footer tagline
+  - Copyright text
+  - Show/hide footer columns toggle
+
+  NAVIGATION:
+  - Edit nav link labels (Home, About, Contact Us)
+  - Toggle nav items visible/hidden
+
+---
+
+### 8. 📥 MESSAGES INBOX
+
+- Table: Name | Email | Phone | Product Interest | Message Preview | Date | Status
+- Click row → expands full message in a detail panel
+- Status toggle: New → Read → Archived
+- Delete message button
+- Filter tabs: All | New | Read | Archived
+- "Reply on WhatsApp" button per message (opens wa.me with their phone)
+- Export to CSV button (generates and downloads messages as .csv)
+
+---
+
+### 9. 🖼️ MEDIA LIBRARY (lightweight)
+- Grid of all image URLs entered anywhere in the CMS
+- Click any image → copy URL to clipboard
+- Add new image URL manually
+- Images show broken-image state gracefully
+
+---
+
+### 10. 👁️ PREVIEW MODE
+- "Preview Site" button in admin top bar
+- Opens public site in a new tab
+- Small floating banner on public site in preview mode: 
+  "Preview Mode — viewing unsaved changes" with "Back to Admin" link
+
+═══════════════════════════════════════════
+PART 3 — DATA ARCHITECTURE
+═══════════════════════════════════════════
+
+## CMSContext (React Context)
+One global context object with this shape:
+
+{
+  settings: {
+    siteName, tagline, logoUrl, accentColor, whatsappNumber,
+    instagramUrl, footerText, navLinks[]
+  },
+  homePage: {
+    sections: {
+      hero: { visible, headline, subheadline, ctaLabel, ctaLink, imageUrl },
+      featured: { visible, heading, productIds[] },
+      stats: { visible, items: [{number, label}] },
+      aboutTeaser: { visible, heading, p1, p2, imageUrl, btnLabel, btnLink },
+      testimonials: { visible, heading, items: [{name, role, quote, rating, avatar}] },
+      brands: { visible, items: [{name, logoUrl}] },
+      ctaBanner: { visible, heading, subtext, btnLabel, btnLink, bg }
+    }
+  },
+  categories: [{ id, name, slug, icon, description, bannerUrl, visible, order }],
+  products: [{
+    id, name, slug, categoryId, tagline, description, visible, featured,
+    images: [{url, isPrimary}],
+    portfolioPhotos: [{url, caption}],
+    specs: [{key, value}],
+    dimensions: { width, height, depth, unit, weight, notes },
+    meta: { title, description }
+  }],
+  aboutPage: {
+    hero, story, process[], team[], values[], awards[]
+  },
+  contactPage: {
+    phone, email, whatsapp, address, mapsUrl, officeHours,
+    formHeading, productOptions[], successMessage
+  },
+  messages: [{
+    id, name, email, phone, productInterest, message, date, status
+  }]
+}
+
+All context changes → immediately written to localStorage via useEffect.
+On app load → read from localStorage, fall back to defaultDummyData if empty.
+
+═══════════════════════════════════════════
+PART 4 — DUMMY DATA
+═══════════════════════════════════════════
+
+Seed the following on first load:
+
+CATEGORIES (4):
+1. Corean, Bowl and Vanity
+2. Fabricated Vanity  
+3. 3D Tiles
+4. Solid Surface
+
+PRODUCTS (16 total, 4 per category):
+Each with: name, tagline, 2-paragraph description, 5 picsum image URLs,
+3 portfolio photo URLs, 5 spec rows, dimensions.
+
+Use picsum seeds like: https://picsum.photos/seed/vanity1/800/600
+
+TESTIMONIALS (3), TEAM MEMBERS (3), STATS (4), PROCESS STEPS (4),
+BRAND VALUES (3), DUMMY MESSAGES (5)
+
+═══════════════════════════════════════════
+PART 5 — TECHNICAL REQUIREMENTS
+═══════════════════════════════════════════
+
+- Next.js 14+ App Router
+- Tailwind CSS
+- shadcn/ui: Dialog, Sheet, Table, Toast, Tabs, Select, Switch, Badge,
+  Dropdown, Command (for multi-select), Popover
+- Framer Motion: page transitions, scroll reveals, sidebar animations
+- @dnd-kit/core for drag-to-reorder in product images and categories
+- react-colorful for color pickers in Global Settings
+- All admin forms: react-hook-form + zod validation
+- No external auth library — just localStorage password session
+- Fully responsive — admin panel usable on tablet minimum
+
+FOLDER STRUCTURE:
+/app
+  /(public)/page.tsx             ← Home
+  /(public)/about/page.tsx
+  /(public)/contact/page.tsx
+  /(public)/products/[category]/page.tsx
+  /(public)/products/[category]/[productId]/page.tsx
+  /admin/page.tsx                ← Login gate
+  /admin/dashboard/page.tsx
+  /admin/home/page.tsx
+  /admin/products/page.tsx
+  /admin/categories/page.tsx
+  /admin/about/page.tsx
+  /admin/contact/page.tsx
+  /admin/settings/page.tsx
+  /admin/messages/page.tsx
+  /admin/media/page.tsx
+
+/context/CMSContext.tsx
+/lib/defaultData.ts
+/lib/localStorage.ts
+/components/...

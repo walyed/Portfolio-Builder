@@ -1,0 +1,16 @@
+packages:
+  "framer-motion": "For page transitions, scroll reveals, and elegant UI animations"
+  "@dnd-kit/core": "For drag-to-reorder functionality in admin categories"
+  "@dnd-kit/sortable": "Sortable list preset for dnd-kit"
+  "@dnd-kit/utilities": "Utilities for dnd-kit sorting"
+  "react-colorful": "For color picking in global settings"
+  "react-hook-form": "For robust form state management in admin"
+  "@hookform/resolvers": "For zod validation integration"
+  "lucide-react": "For beautiful consistent iconography"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility for merging tailwind classes"
+
+images: []
+notes:
+  - "App is entirely frontend-driven using React Context and localStorage for persistence."
+  - "No backend API calls are made. Default data is seeded on first load."
