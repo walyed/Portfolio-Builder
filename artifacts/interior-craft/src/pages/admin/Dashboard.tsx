@@ -3,7 +3,7 @@ import { useLocation, Link } from 'wouter';
 import { useCMS } from '@/context/CMSContext';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, Folders, MessageSquare, Star, ArrowRight } from 'lucide-react';
+import { Package, Folders, MessageSquare, Star, ArrowRight, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Dashboard() {
