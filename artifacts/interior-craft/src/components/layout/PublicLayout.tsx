@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useRoute } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Instagram, MessageCircle } from 'lucide-react';
+import { Menu, X, Instagram, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCMS } from '@/context/CMSContext';
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { data } = useCMS();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { settings, categories } = data;
 
   const NavItem = ({ href, label, icon }: { href: string; label: string; icon?: string }) => {
@@ -14,8 +15,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     return (
       <Link href={href} onClick={() => setMobileMenuOpen(false)}>
         <span className={`flex items-center gap-3 py-2 px-4 rounded-lg transition-all cursor-pointer ${
-          isActive 
-            ? 'bg-primary/10 text-primary font-medium' 
+          isActive
+            ? 'bg-primary/10 text-primary font-medium'
             : 'text-muted-foreground hover:bg-black/5 hover:text-foreground'
         }`}>
           {icon && <span>{icon}</span>}
@@ -25,8 +26,17 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const Sidebar = () => (
-    <div className="w-64 h-full bg-sidebar border-r border-sidebar-border flex flex-col pt-8 pb-6 px-4">
+  const SidebarContent = () => (
+    <div className="w-64 h-full bg-sidebar border-r border-sidebar-border flex flex-col pt-8 pb-6 px-4 relative">
+      {/* Collapse toggle button */}
+      <button
+        onClick={() => setSidebarCollapsed(true)}
+        className="absolute -right-3 top-8 z-10 bg-background border border-border rounded-full w-6 h-6 flex items-center justify-center shadow-md text-muted-foreground hover:text-foreground transition-colors hidden md:flex"
+        title="Collapse sidebar"
+      >
+        <ChevronLeft size={14} />
+      </button>
+
       <div className="mb-10 px-4">
         {settings.logoUrl ? (
           <img src={settings.logoUrl} alt={settings.siteName} className="h-10" />
@@ -51,7 +61,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             Collections
           </h4>
           <nav className="space-y-1">
-            {categories.filter(c => c.visible).sort((a,b) => a.order - b.order).map(cat => (
+            {categories.filter(c => c.visible).sort((a, b) => a.order - b.order).map(cat => (
               <NavItem key={cat.id} href={`/products/${cat.slug}`} label={cat.name} icon={cat.icon} />
             ))}
           </nav>
@@ -70,10 +80,41 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row font-sans">
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:block fixed inset-y-0 left-0 z-50">
-        <Sidebar />
-      </aside>
+
+      {/* Desktop Sidebar — animated slide */}
+      <AnimatePresence initial={false}>
+        {!sidebarCollapsed && (
+          <motion.aside
+            key="sidebar"
+            initial={{ x: -256 }}
+            animate={{ x: 0 }}
+            exit={{ x: -256 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="hidden md:block fixed inset-y-0 left-0 z-50"
+            style={{ width: 256 }}
+          >
+            <SidebarContent />
+          </motion.aside>
+        )}
+      </AnimatePresence>
+
+      {/* Expand button — visible when sidebar is collapsed */}
+      <AnimatePresence>
+        {sidebarCollapsed && (
+          <motion.button
+            key="expand-btn"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setSidebarCollapsed(false)}
+            className="hidden md:flex fixed left-0 top-1/2 -translate-y-1/2 z-50 bg-background border border-border rounded-r-xl px-1.5 py-4 shadow-md text-muted-foreground hover:text-foreground hover:shadow-lg transition-all flex-col items-center gap-1"
+            title="Open sidebar"
+          >
+            <ChevronRight size={16} />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Mobile Header */}
       <header className="md:hidden flex items-center justify-between p-4 bg-background border-b z-40 sticky top-0">
@@ -108,14 +149,18 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <button onClick={() => setMobileMenuOpen(false)} className="absolute top-4 right-4 p-2 text-muted-foreground">
                 <X />
               </button>
-              <Sidebar />
+              <SidebarContent />
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
-      <main className="flex-1 md:ml-64 flex flex-col min-h-screen relative">
+      {/* Main Content — shifts based on sidebar state */}
+      <motion.main
+        animate={{ marginLeft: sidebarCollapsed ? 0 : 256 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+        className="flex-1 flex flex-col min-h-screen relative md:ml-0"
+      >
         <div className="flex-1">
           <AnimatePresence mode="wait">
             <motion.div
@@ -140,7 +185,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <p className="text-sm text-white/40">{settings.footerText}</p>
           </div>
         </footer>
-      </main>
+      </motion.main>
 
       {/* Floating WhatsApp */}
       {settings.whatsappNumber && (
