@@ -39,7 +39,9 @@ const allowlist = [
 
 async function buildAll() {
   const distDir = path.resolve(__dirname, "dist");
+  const apiDir = path.resolve(__dirname, "api");
   await rm(distDir, { recursive: true, force: true });
+  await rm(apiDir, { recursive: true, force: true });
 
   console.log("building server...");
   const pkgPath = path.resolve(__dirname, "package.json");
@@ -54,12 +56,13 @@ async function buildAll() {
       !(pkg.dependencies?.[dep]?.startsWith("workspace:")),
   );
 
+  // ESM bundle for Vercel (api/index.js) — bundles all workspace packages inline
   await esbuild({
     entryPoints: [path.resolve(__dirname, "src/index.ts")],
     platform: "node",
     bundle: true,
-    format: "cjs",
-    outfile: path.resolve(distDir, "index.cjs"),
+    format: "esm",
+    outfile: path.resolve(apiDir, "index.js"),
     define: {
       "process.env.NODE_ENV": '"production"',
     },
